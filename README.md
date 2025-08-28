@@ -129,3 +129,16 @@ ChatGPT Kids inherits a comprehensive set of modern web tools:
 5. **Explore** the codebase, customize the UI, and add your own features.
 
 ChatGPT Kids empowers developers to create a safe, educational, and fun environment for children, combining robust engineering with thoughtful design. Built with ❤️ for families and educators—ready to create the future of safe AI interaction? Let’s get started! 🚀
+
+<img width="1512" height="859" alt="Screenshot 2025-08-28 at 3 08 15 PM" src="https://github.com/user-attachments/assets/2f6c204a-f9b2-434e-a8dd-1df32fa79c6c" />
+
+<img width="1511" height="860" alt="Screenshot 2025-08-28 at 3 12 29 PM" src="https://github.com/user-attachments/assets/506a41f4-4757-442e-b7c7-d67830fc5449" />
+
+<img width="1512" height="861" alt="Screenshot 2025-08-28 at 3 12 40 PM" src="https://github.com/user-attachments/assets/172f8459-ad7e-44ad-acdd-e5a034575b9d" />
+
+<img width="1512" height="860" alt="Screenshot 2025-08-28 at 3 12 47 PM" src="https://github.com/user-attachments/assets/fbdb3952-e578-4dc3-8380-1d19c6ca129e" />
+
+<img width="1512" height="861" alt="Screenshot 2025-08-28 at 3 12 54 PM" src="https://github.com/user-attachments/assets/9ca2a966-327b-405b-85cf-dc89d6092b76" />
+
+
+
