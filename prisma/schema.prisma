@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PARENT
+  CHILD
+  ADMIN
+}
+
+enum AgeGroup {
+  UNDER_5
+  AGE_5_8
+  AGE_9_12
+  AGE_13_17
+  ADULT
+}
+
+enum MaturityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  UNRESTRICTED
+}
+
+model User {
+  id              String      @id @default(cuid())
+  email           String      @unique
+  name            String?
+  role            UserRole    @default(CHILD)
+  ageGroup        AgeGroup?
+  parentId        String?
+  pin             String?     // 4-digit PIN for parental controls
+  isVerified      Boolean     @default(false)
+  consentStatus   Boolean     @default(false) // Parental consent status
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  parent          User?       @relation("ParentChild", fields: [parentId], references: [id])
+  children        User[]      @relation("ParentChild")
+  parentalControl ParentalControl?
+  sessions        Session[]
+  chatMessages    ChatMessage[]
+  moderationLogs  ModerationLog[]
+  blockedTopics   BlockedTopic[]
+
+  @@map("users")
+}
+
+model ParentalControl {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  maturityLevel   MaturityLevel @default(MEDIUM)
+  enablePin       Boolean       @default(true)
+  sessionLimit    Int?          // Daily session limit in minutes
+  timeRestrictions Json?        // Time-based restrictions
+  blockedCategories Json?       // Store as JSON array
+  enableCrisisDetection Boolean @default(true)
+  weeklyReports   Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("parental_controls")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  sessionToken  String   @unique
+  isActive      Boolean  @default(true)
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  deviceInfo    Json?
+  ipAddress     String?
+  location      String?
+  createdAt     DateTime @default(now())
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model ChatMessage {
+  id              String   @id @default(cuid())
+  userId          String
+  sessionId       String?
+  role            String   // "user" or "assistant"
+  content         String
+  mode            String?  // "study", "creative", "general"
+  isFlagged       Boolean  @default(false)
+  flagReason      String?
+  moderationScore Float?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model BlockedTopic {
+  id          String   @id @default(cuid())
+  userId      String
+  keyword     String
+  category    String?
+  isRegex     Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, keyword])
+  @@map("blocked_topics")
+}
+
+model ModerationLog {
+  id              String   @id @default(cuid())
+  userId          String
+  chatMessageId   String?
+  eventType       String   // "content_flagged", "crisis_detected", "age_violation", etc.
+  severity        String   // "low", "medium", "high", "critical"
+  description     String
+  actionTaken     String?  // "blocked", "modified", "escalated", "logged"
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("moderation_logs")
+}
+
+model AgeVerification {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  ageGroup        AgeGroup
+  verificationMethod String // "self_attestation", "parental_verification", "document_verification"
+  verifiedAt      DateTime @default(now())
+  expiresAt       DateTime?
+  ipAddress       String?
+  location        String?
+  consentData     Json?    // Store consent information
+  createdAt       DateTime @default(now())
+
+  @@map("age_verifications")
+}
+
+model ComplianceReport {
+  id              String   @id @default(cuid())
+  reportType      String   // "weekly", "monthly", "incident"
+  userId          String?
+  data            Json
+  generatedAt     DateTime @default(now())
+
+  @@map("compliance_reports")
+}
